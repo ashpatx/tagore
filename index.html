@@ -3,89 +3,142 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="An interactive book with flipping pages of quotes from Tagore and animated shaders"
-    />
     <title>Creative Unity by Tagore</title>
     <link rel="stylesheet" href="styles/book.css" />
     <link rel="stylesheet" href="styles/animation.css" />
   </head>
   <body>
     <div class="book">
-      <div class="pages">
-        <!-- Cover Page -->
-        <div class="page cover" onclick="handleClick(1)">
-          <div class="page-content">
-            <h1 class="book-title">Creative Unity</h1>
-            <h2 class="book-author">by Tagore</h2>
-          </div>
-        </div>
-        <div class="page"></div>
-
-        <!-- Quote Pages -->
-        <div class="page" onclick="handleClick(3)">
-          <div class="page-content">
-            <h3 class="chapter-title">Quotes</h3>
-          </div>
-        </div>
-        <div class="page" onclick="handleClick(4)">
-          <div class="page-content">
-            <p class="quote">
-              "You can't cross the sea merely by standing and staring at the
-              water."
-            </p>
-            <p class="author">Rabindranath Tagore</p>
-          </div>
-        </div>
-
-        <div class="page" onclick="handleClick(5)">
-          <div class="page-content image-page">
-            <img
-              src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg"
-              alt="Serene landscape"
-              class="animated-image"
-            />
-          </div>
-        </div>
-
-        <div class="page" onclick="handleClick(6)">
-          <div class="page-content">
-            <p class="quote">
-              "Faith is the bird that feels the light when the dawn is still
-              dark."
-            </p>
-            <p class="author">Rabindranath Tagore</p>
-          </div>
-        </div>
-
-        <div class="page" onclick="handleClick(7)">
-          <div class="page-content image-page">
-            <img
-              src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg"
-              alt="Serene landscape"
-              class="animated-image"
-            />
-          </div>
-        </div>
-
-        <div class="page" onclick="handleClick(8)">
-          <div class="page-content">
-            <p class="quote">
-              "The butterfly counts not months but moments, and has time
-              enough."
-            </p>
-            <p class="author">Rabindranath Tagore</p>
-          </div>
-        </div>
-
-        <!-- Additional pages for thickness -->
-        <div class="page"></div>
-        <div class="page"></div>
-        <div class="page"></div>
+      <div id="pages" class="pages">
+        <!-- Pages will be dynamically inserted here -->
       </div>
     </div>
 
-    <script src="scripts/book.js"></script>
+    <script>
+      const quotes = [
+        {
+          text: "You can't cross the sea merely by standing and staring at the water.",
+          author: "Rabindranath Tagore",
+        },
+        {
+          text: "Faith is the bird that feels the light when the dawn is still dark.",
+          author: "Rabindranath Tagore",
+        },
+        {
+          text: "The butterfly counts not moments but moments, and has time enough.",
+          author: "Rabindranath Tagore",
+        },
+      ];
+
+      let currentPage = 0;
+
+      function createBook() {
+        const pagesContainer = document.getElementById("pages");
+
+        // Create cover
+        const coverPage = createPage("cover", 1);
+        coverPage.innerHTML = `
+                <div class="page-content">
+                    <h1 class="book-title">Creative Unity</h1>
+                    <h2 class="book-author">by Tagore</h2>
+                </div>
+            `;
+        pagesContainer.appendChild(coverPage);
+        pagesContainer.appendChild(createPage("", 2));
+
+        // Create quote pages
+        quotes.forEach((quote, index) => {
+          const leftPage = createPage("", index * 2 + 3);
+          if (index === 0) {
+            leftPage.innerHTML = `
+                        <div class="page-content">
+                            <h3 class="chapter-title">Quotes</h3>
+                        </div>
+                    `;
+          } else {
+            leftPage.innerHTML = `
+                        <div class="page-content image-page">
+                            <img src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg" alt="Serene landscape" class="polaroid-image">
+                        </div>
+                    `;
+          }
+
+          const rightPage = createPage("", index * 2 + 4);
+          rightPage.innerHTML = `
+                    <div class="page-content">
+                        <p class="quote">${quote.text}</p>
+                        <p class="author">${quote.author}</p>
+                    </div>
+                `;
+
+          pagesContainer.appendChild(leftPage);
+          pagesContainer.appendChild(rightPage);
+        });
+
+        // Add additional pages for thickness
+        for (let i = 0; i < 26; i++) {
+          pagesContainer.appendChild(createPage("", i + quotes.length * 2 + 3));
+        }
+
+        // Set initial z-indexes
+        updatePageZIndexes();
+      }
+
+      function createPage(className, pageNum) {
+        const page = document.createElement("div");
+        page.className = `page ${className}`;
+        page.onclick = () => handlePageClick(pageNum - 1);
+        return page;
+      }
+
+      function updatePageZIndexes() {
+        const pages = document.getElementsByClassName("page");
+        for (let i = 0; i < pages.length; i++) {
+          // Remove the 'next-page' class from all pages first
+          pages[i].classList.remove("next-page");
+
+          // Apply 'next-page' to the odd-numbered (left-side) pages
+          if (i === currentPage + 1 && i % 2 === 0) {
+            // This ensures next-page is applied to the left page
+            pages[i].classList.add("next-page");
+          }
+
+          if (i <= currentPage) {
+            pages[i].style.zIndex = "1";
+          } else {
+            pages[i].style.zIndex = String(pages.length - i);
+          }
+        }
+      }
+
+      function handlePageClick(pageNum) {
+        if (pageNum > currentPage) {
+          flipPageForward(pageNum);
+        } else if (pageNum < currentPage) {
+          flipPageBackward(pageNum);
+        }
+      }
+
+      function flipPageForward(newPage) {
+        const pages = document.getElementsByClassName("page");
+        for (let i = currentPage; i < newPage; i++) {
+          pages[i].classList.add("flipped");
+        }
+        currentPage = newPage;
+        updatePageZIndexes();
+      }
+
+      function flipPageBackward(newPage) {
+        const pages = document.getElementsByClassName("page");
+        for (let i = currentPage - 1; i >= newPage; i--) {
+          pages[i].classList.remove("flipped");
+        }
+        currentPage = newPage;
+        updatePageZIndexes();
+      }
+
+      // Initialize the book
+      createBook();
+    </script>
   </body>
 </html>
