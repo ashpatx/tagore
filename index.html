@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="An interactive book with flipping pages of quotes from Tagore and animated shaders"
+    />
+    <title>Creative Unity by Tagore</title>
+    <link rel="stylesheet" href="styles/book.css" />
+    <link rel="stylesheet" href="styles/animation.css" />
+  </head>
+  <body>
+    <div class="book">
+      <div class="pages">
+        <!-- Cover Page -->
+        <div class="page cover" onclick="handleClick(1)">
+          <div class="page-content">
+            <h1 class="book-title">Creative Unity</h1>
+            <h2 class="book-author">by Tagore</h2>
+          </div>
+        </div>
+        <div class="page"></div>
+
+        <!-- Quote Pages -->
+        <div class="page" onclick="handleClick(3)">
+          <div class="page-content">
+            <h3 class="chapter-title">Quotes</h3>
+          </div>
+        </div>
+        <div class="page" onclick="handleClick(4)">
+          <div class="page-content">
+            <p class="quote">
+              "You can't cross the sea merely by standing and staring at the
+              water."
+            </p>
+            <p class="author">Rabindranath Tagore</p>
+          </div>
+        </div>
+
+        <div class="page" onclick="handleClick(5)">
+          <div class="page-content image-page">
+            <img
+              src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg"
+              alt="Serene landscape"
+              class="animated-image"
+            />
+          </div>
+        </div>
+
+        <div class="page" onclick="handleClick(6)">
+          <div class="page-content">
+            <p class="quote">
+              "Faith is the bird that feels the light when the dawn is still
+              dark."
+            </p>
+            <p class="author">Rabindranath Tagore</p>
+          </div>
+        </div>
+
+        <div class="page" onclick="handleClick(7)">
+          <div class="page-content image-page">
+            <img
+              src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg"
+              alt="Serene landscape"
+              class="animated-image"
+            />
+          </div>
+        </div>
+
+        <div class="page" onclick="handleClick(8)">
+          <div class="page-content">
+            <p class="quote">
+              "The butterfly counts not months but moments, and has time
+              enough."
+            </p>
+            <p class="author">Rabindranath Tagore</p>
+          </div>
+        </div>
+
+        <!-- Additional pages for thickness -->
+        <div class="page"></div>
+        <div class="page"></div>
+        <div class="page"></div>
+      </div>
+    </div>
+
+    <script src="scripts/book.js"></script>
+  </body>
+</html>
