@@ -3,9 +3,116 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Creative Unity by Tagore</title>
-    <link rel="stylesheet" href="styles/book.css" />
-    <link rel="stylesheet" href="styles/animation.css" />
+    <title>Interactive Book</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f5f5f5;
+      }
+
+      .book {
+        perspective: 250vw;
+        transition: opacity 0.4s 0.2s;
+      }
+
+      .pages {
+        width: 60vw;
+        height: 44vw;
+        position: relative;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        border-radius: 4px;
+      }
+
+      .page {
+        position: absolute;
+        top: 0;
+        width: 30vw;
+        height: 44vw;
+        transform-origin: 0 0;
+        transition: transform 1.4s;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        cursor: pointer;
+        user-select: none;
+        background-color: #f0e6d2;
+      }
+
+      .page:nth-child(odd) {
+        pointer-events: all;
+        transform: rotateY(0deg);
+        right: 0;
+        border-radius: 0 4px 4px 0;
+        background-image: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.15) 0%,
+          rgba(0, 0, 0, 0) 10%
+        );
+      }
+
+      .page:nth-child(even) {
+        pointer-events: none;
+        transform: rotateY(180deg);
+        transform-origin: 100% 0;
+        left: 0;
+        border-radius: 4px 0 0 4px;
+        background-image: linear-gradient(
+          to left,
+          rgba(0, 0, 0, 0.12) 0%,
+          rgba(0, 0, 0, 0) 10%
+        );
+      }
+
+      .page.flipped:nth-child(odd) {
+        pointer-events: none;
+        transform: rotateY(-180deg);
+      }
+
+      .page.flipped:nth-child(even) {
+        pointer-events: all;
+        transform: rotateY(0deg);
+      }
+
+      .page-content {
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .quote {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 2.5vw;
+        color: #000;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .author {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 2vw;
+        color: #555;
+        margin-top: 1rem;
+      }
+
+      .image-page img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+    </style>
   </head>
   <body>
     <div class="book">
@@ -15,130 +122,92 @@
     </div>
 
     <script>
-      const quotes = [
+      const pagesData = [
         {
-          text: "You can't cross the sea merely by standing and staring at the water.",
-          author: "Rabindranath Tagore",
+          type: "quote",
+          content: `
+            <div class="page-content">
+              <p class="quote">"Faith is the bird that feels the light when the dawn is still dark."</p>
+              <p class="author">- Rabindranath Tagore</p>
+            </div>
+          `,
         },
         {
-          text: "Faith is the bird that feels the light when the dawn is still dark.",
-          author: "Rabindranath Tagore",
+          type: "image",
+          content: `
+            <div class="page-content image-page">
+              <img src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg" alt="Decorative Image" />
+            </div>
+          `,
         },
         {
-          text: "The butterfly counts not moments but moments, and has time enough.",
-          author: "Rabindranath Tagore",
+          type: "quote",
+          content: `
+            <div class="page-content">
+              <p class="quote">"The butterfly counts not months but moments, and has time enough."</p>
+              <p class="author">- Rabindranath Tagore</p>
+            </div>
+          `,
+        },
+        {
+          type: "image",
+          content: `
+            <div class="page-content image-page">
+              <img src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg" alt="Decorative Image" />
+            </div>
+          `,
+        },
+        {
+          type: "quote",
+          content: `
+            <div class="page-content">
+              <p class="quote">"You can't cross the sea merely by standing and staring at the water."</p>
+              <p class="author">- Rabindranath Tagore</p>
+            </div>
+          `,
+        },
+        {
+          type: "image",
+          content: `
+            <div class="page-content image-page">
+              <img src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg" alt="Decorative Image" />
+            </div>
+          `,
         },
       ];
-
-      let currentPage = 0;
 
       function createBook() {
         const pagesContainer = document.getElementById("pages");
 
-        // Create cover
-        const coverPage = createPage("cover", 1);
-        coverPage.innerHTML = `
-                <div class="page-content">
-                    <h1 class="book-title">Creative Unity</h1>
-                    <h2 class="book-author">by Tagore</h2>
-                </div>
-            `;
-        pagesContainer.appendChild(coverPage);
-        pagesContainer.appendChild(createPage("", 2));
-
-        // Create quote pages
-        quotes.forEach((quote, index) => {
-          const leftPage = createPage("", index * 2 + 3);
-          if (index === 0) {
-            leftPage.innerHTML = `
-                        <div class="page-content">
-                            <h3 class="chapter-title">Quotes</h3>
-                        </div>
-                    `;
-          } else {
-            leftPage.innerHTML = `
-                        <div class="page-content image-page">
-                            <img src="https://live.staticflickr.com/65535/53079752146_2af85be73f_k.jpg" alt="Serene landscape" class="polaroid-image">
-                        </div>
-                    `;
-          }
-
-          const rightPage = createPage("", index * 2 + 4);
-          rightPage.innerHTML = `
-                    <div class="page-content">
-                        <p class="quote">${quote.text}</p>
-                        <p class="author">${quote.author}</p>
-                    </div>
-                `;
-
-          pagesContainer.appendChild(leftPage);
-          pagesContainer.appendChild(rightPage);
+        pagesData.forEach((pageData) => {
+          const page = document.createElement("div");
+          page.className = `page ${pageData.type}`;
+          page.innerHTML = pageData.content;
+          page.addEventListener("click", handleClick);
+          pagesContainer.appendChild(page);
         });
-
-        // Add additional pages for thickness
-        for (let i = 0; i < 26; i++) {
-          pagesContainer.appendChild(createPage("", i + quotes.length * 2 + 3));
-        }
-
-        // Set initial z-indexes
-        updatePageZIndexes();
       }
 
-      function createPage(className, pageNum) {
-        const page = document.createElement("div");
-        page.className = `page ${className}`;
-        page.onclick = () => handlePageClick(pageNum - 1);
-        return page;
-      }
-
-      function updatePageZIndexes() {
+      function handleClick(event) {
+        const page = event.currentTarget;
         const pages = document.getElementsByClassName("page");
-        for (let i = 0; i < pages.length; i++) {
-          // Remove the 'next-page' class from all pages first
-          pages[i].classList.remove("next-page");
+        const pageIndex = Array.from(pages).indexOf(page);
 
-          // Apply 'next-page' to the odd-numbered (left-side) pages
-          if (i === currentPage + 1 && i % 2 === 0) {
-            // This ensures next-page is applied to the left page
-            pages[i].classList.add("next-page");
+        if (pageIndex % 2 === 0) {
+          page.classList.add("flipped");
+          if (pages[pageIndex + 1]) {
+            pages[pageIndex + 1].classList.add("flipped");
           }
-
-          if (i <= currentPage) {
-            pages[i].style.zIndex = "1";
-          } else {
-            pages[i].style.zIndex = String(pages.length - i);
+        } else {
+          page.classList.remove("flipped");
+          if (pages[pageIndex - 1]) {
+            pages[pageIndex - 1].classList.remove("flipped");
           }
         }
-      }
-
-      function handlePageClick(pageNum) {
-        if (pageNum > currentPage) {
-          flipPageForward(pageNum);
-        } else if (pageNum < currentPage) {
-          flipPageBackward(pageNum);
-        }
-      }
-
-      function flipPageForward(newPage) {
-        const pages = document.getElementsByClassName("page");
-        for (let i = currentPage; i < newPage; i++) {
-          pages[i].classList.add("flipped");
-        }
-        currentPage = newPage;
-        updatePageZIndexes();
-      }
-
-      function flipPageBackward(newPage) {
-        const pages = document.getElementsByClassName("page");
-        for (let i = currentPage - 1; i >= newPage; i--) {
-          pages[i].classList.remove("flipped");
-        }
-        currentPage = newPage;
-        updatePageZIndexes();
       }
 
       // Initialize the book
-      createBook();
+      document.addEventListener("DOMContentLoaded", createBook);
     </script>
   </body>
 </html>
